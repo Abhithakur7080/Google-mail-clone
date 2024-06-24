@@ -1,27 +1,15 @@
-import React from 'react'
-import Message from './Message'
+import React from "react";
+import Message from "./Message";
 
-const Messages = () => {
+const Messages = ({messages}) => {
   return (
-    <div>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
-        <Message/>
+    <div>{
+      messages.map((message) => (
+        <Message message={message}/>
+      ))}
+      
     </div>
-  )
-}
+  );
+};
 
-export default Messages
+export default Messages;

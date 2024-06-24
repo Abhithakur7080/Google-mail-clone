@@ -9,14 +9,20 @@ import {
   setMinimize,
   setOpen,
 } from "../redux/reducers/appSlice";
+import { useFirebase } from "../firebase/firebase";
+import { serverTimestamp } from "firebase/firestore";
+import { newMail } from "../redux/reducers/mailSlice";
+import { timeAgo } from "../firebase/utils";
 
 const SendMail = () => {
   const { open, minimize, full } = useSelector(appSelector);
+  const currentUser = useFirebase();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
-    to: "",
+    sender: "",
+    receiver: "",
     subject: "",
-    message: "",
+    content: "",
   });
   const handleChangeFormData = (e) => {
     let key = e.target.name;
@@ -25,12 +31,27 @@ const SendMail = () => {
   };
   const handleSubmitFormData = (e) => {
     e.preventDefault();
-  }
+    const updatedData = {
+      ...formData,
+      sender: currentUser.email,
+      read: false,
+      createdAt: serverTimestamp(),
+    };
+    dispatch(newMail(updatedData));
+    setFormData({
+      sender: "",
+      receiver: "",
+      subject: "",
+      content: "",
+    });
+    dispatch(setOpen(false));
+  };
+
   return (
     <div
       className={`${
         open ? "block" : "hidden"
-      } bg-white max-w-6xl shadow-slate-600 rounded-t-md`}
+      } bg-white shadow-slate-600 rounded-t-md h-full`}
     >
       <div className="flex px-1 py-2 bg-[#f2f6fc] rounded-t-md">
         <h1>New Message</h1>
@@ -57,10 +78,13 @@ const SendMail = () => {
           <RxCross2 size={20} />
         </div>
       </div>
-      <form className={`flex-col p-3 gap-2 ${minimize ? "hidden" : "flex"}`}>
+      <form
+        onSubmit={handleSubmitFormData}
+        className={`flex-col p-3 gap-2 ${minimize ? "hidden" : "flex"}`}
+      >
         <input
-          name="to"
-          value={formData.to}
+          name="receiver"
+          value={formData.receiver}
           onChange={handleChangeFormData}
           type="text"
           placeholder="To"
@@ -75,8 +99,8 @@ const SendMail = () => {
           className="outline-none py-1"
         />
         <textarea
-          name="message"
-          value={formData.message}
+          name="content"
+          value={formData.content}
           onChange={handleChangeFormData}
           cols={30}
           rows={10}

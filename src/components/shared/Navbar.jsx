@@ -1,25 +1,34 @@
-import React from "react";
-import { RxHamburgerMenu } from "react-icons/rx";
-import { IoIosSearch } from "react-icons/io";
-import { IoOptions } from "react-icons/io5";
+import React, { useState } from "react";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 import { GoGear } from "react-icons/go";
 import { PiDotsNineBold } from "react-icons/pi";
-import logo from "../../assets/logo.png";
 import { Tooltip as ReactTooltip } from "react-tooltip";
+import { useFirebase } from "../../firebase/firebase";
+import logo from "../../assets/logo.png";
+import { RxHamburgerMenu } from "react-icons/rx";
+import { setMenuOpen } from "../../redux/reducers/appSlice";
+import { logoutUser } from "../../firebase/builds";
+import { useDispatch } from "react-redux";
 
 const Navbar = () => {
+  const [menuLogout, setMenuLogout] = useState(false);
+  const dispatch = useDispatch()
+  const currentUser = useFirebase();
+  const defaultAvatar =
+    "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png";
+
   return (
     <>
-      <div className="flex items-center justify-between my-3 h-16">
+      <div className="flex items-center justify-between my-0 md:my-3 h-16">
         <div className="flex items-center justify-between gap-10">
           <div className="flex items-center gap-2 ms-8">
             {/* menu icon */}
             <div
+              onClick={() => dispatch(setMenuOpen())}
               data-tooltip-id="main-menu"
               className="p-3 rounded-full hover:bg-gray-200 cursor-pointer"
             >
-              <RxHamburgerMenu size={24} />
+              <RxHamburgerMenu size={30} className="text-gray-700" />
             </div>
             {/* logo */}
             <img src={logo} alt="logo" className="w-28" title="Gmail" />
@@ -27,62 +36,116 @@ const Navbar = () => {
         </div>
         <div className="md:block hidden w-[50%]">
           <div className="flex items-center bg-[#eaf1fb] px-2 py-2 rounded-full">
+            {/* Search */}
             <div
               data-tooltip-id="search"
               className="p-3 rounded-full hover:bg-gray-300 cursor-pointer"
             >
-              <IoIosSearch size={24} className="text-gray-700" />
+              <input
+                type="text"
+                placeholder="Search mail"
+                className="rounded-full w-full bg-transparent outline-none px-1 text-xl"
+              />
             </div>
-            <input
-              type="text"
-              placeholder="Search mail"
-              className="rounded-full w-full bg-transparent outline-none px-1 text-xl"
-            />
             <div
               data-tooltip-id="search-options"
               className="p-3 rounded-full hover:bg-gray-300 cursor-pointer"
             >
-              <IoOptions size={24} className="text-gray-700" />
+              <GoGear size={30} className="text-gray-700" />
             </div>
           </div>
         </div>
-        <div className="md:block hidden me-8">
+        <div className="me-8">
           <div className="flex items-center gap-2">
             <div
               data-tooltip-id="support"
-              className="p-3 rounded-full hover:bg-gray-300 cursor-pointer"
+              className="p-3 rounded-full md:block hidden hover:bg-gray-300 cursor-pointer"
             >
               <AiOutlineQuestionCircle size={30} className="text-gray-700" />
             </div>
             <div
               data-tooltip-id="setting"
-              className="p-3 rounded-full hover:bg-gray-300 cursor-pointer"
+              className="p-3 rounded-full hover:bg-gray-300 cursor-pointer md:block hidden"
             >
               <GoGear size={30} className="text-gray-700" />
             </div>
             <div
               data-tooltip-id="google-apps"
-              className="p-3 rounded-full hover:bg-gray-300 cursor-pointer"
+              className="p-3 rounded-full hover:bg-gray-300 cursor-pointer md:block hidden"
             >
               <PiDotsNineBold size={30} className="text-gray-700" />
             </div>
-            <div data-tooltip-id="user-info" className="cursor-pointer">
-              <img
-                className="w-10 h-10 rounded-full"
-                src="https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png"
-                alt="Rounded avatar"
-              />
-            </div>
+            {/* User Info */}
+            {currentUser && (
+              <div
+                data-tooltip-id="user-info"
+                className="cursor-pointer relative"
+                onMouseEnter={() => setMenuLogout(true)}
+                onMouseLeave={() => setMenuLogout(false)}
+              >
+                <img
+                  className="w-10 h-10 rounded-full"
+                  src={currentUser.photoURL || defaultAvatar}
+                  alt="Rounded avatar"
+                />
+                <div
+                  onClick={logoutUser}
+                  className={`bg-gray-200 absolute top-10 -left-4 rounded-md overflow-hidden ${
+                    menuLogout ? "block" : "hidden"
+                  }`}
+                >
+                  <h3 className="text-lg text-gray-800 p-2 hover:bg-gray-300">
+                    Logout
+                  </h3>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-      <ReactTooltip place="bottom" id="main-menu" content="Main menu"/>
-      <ReactTooltip place="bottom" id="search" content="Search"/>
-      <ReactTooltip place="bottom" id="search-options" content="Show search options"/>
-      <ReactTooltip place="bottom" id="support" content="Support"/>
-      <ReactTooltip place="bottom" id="setting" content="Settings"/>
-      <ReactTooltip place="bottom" id="google-apps" content="Google apps"/>
-      <ReactTooltip place="bottom" id="user-info" content="abhijeetthakur7080@gmail.com"/>
+      {/* Tooltips */}
+      <ReactTooltip
+        className="hidden md:block"
+        place="bottom"
+        id="main-menu"
+        content="Main menu"
+      />
+      <ReactTooltip
+        className="hidden md:block"
+        place="bottom"
+        id="search"
+        content="Search"
+      />
+      <ReactTooltip
+        className="hidden md:block"
+        place="bottom"
+        id="search-options"
+        content="Show search options"
+      />
+      <ReactTooltip
+        className="hidden md:block"
+        place="bottom"
+        id="support"
+        content="Support"
+      />
+      <ReactTooltip
+        className="hidden md:block"
+        place="bottom"
+        id="setting"
+        content="Settings"
+      />
+      <ReactTooltip
+        className="hidden md:block"
+        place="bottom"
+        id="google-apps"
+        content="Google apps"
+      />
+      <ReactTooltip
+        className="hidden md:block"
+        place="bottom"
+        id="user-info"
+        content={currentUser ? currentUser.email : "Not logged in"}
+      />
     </>
   );
 };

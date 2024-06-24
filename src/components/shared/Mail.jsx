@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BiArchiveIn } from "react-icons/bi";
 import { IoMdMore } from "react-icons/io";
 import { IoArrowBack } from "react-icons/io5";
@@ -12,15 +12,35 @@ import {
   MdOutlineWatchLater,
 } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { getADataFromFirestoreRef } from "../../firebase/builds";
 
 const Mail = () => {
   const [mailQtyActive, setMailQtyActive] = useState(false);
+  const [message, setMessage] = useState(null);
+  const { id } = useParams();
+
+  useEffect(() => {
+    const unsubscribe = getADataFromFirestoreRef("inbox", id, (data) => {
+      setMessage(data);
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, [id]);
+
+  if (!message) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="flex-1 bg-white rounded-xl mx-5">
       <div className="flex items-center justify-between px-4">
         <div className="flex items-center gap-2 text-gray-700 py-2 w-full">
-          <Link to={"/"} className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+          <Link
+            to={"/"}
+            className="p-2 rounded-full hover:bg-gray-200 cursor-pointer"
+          >
             <IoArrowBack size={20} />
           </Link>
           <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
@@ -73,19 +93,19 @@ const Mail = () => {
       <div className="h-[90vh] overflow-y-auto p-4">
         <div className="flex items-center justify-between bg-white gap-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-medium">Subject</h1>
+            <h1 className="text-xl font-medium">{message.subject}</h1>
             <span className="text-sm bg-gray-200 rounded-md px-2">Inbox</span>
           </div>
           <div className="flex-none text-gray-500 my-5 text-sm">
-            <p>12-08-2024</p>
+            <p>{new Date(message.createdAt?.seconds*1000).toUTCString()}</p>
           </div>
         </div>
         <div className="text-gray-500 text-sm">
-          <h1>abhijeetthakur7080@gmail.com</h1>
+          <h1>{message.sender}</h1>
           <span>to me</span>
         </div>
         <div className="my-10">
-          <p>Message</p>
+          <pre className="text-wrap">{message.content}</pre>
         </div>
       </div>
     </div>
