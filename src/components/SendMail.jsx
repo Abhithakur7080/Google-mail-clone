@@ -66,8 +66,8 @@ const SendMail = () => {
         subject: "",
         content: "",
       });
-      dispatch(setOpen(false))
     }
+    dispatch(setOpen(false))
   }
 
   return (
