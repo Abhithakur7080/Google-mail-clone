@@ -25,10 +25,11 @@ const Message = ({ message }) => {
 
   const handleStarClick = () => {
     dispatch(markAsStarred({ id: message.id, mail: message }));
+    window.location.reload()
   };
 
   return (
-    <div className="flex items-start justify-between border-gray-200 px-4 py-3 text-sm hover:shadow-md">
+    <div className="flex w-screen md:w-full items-start justify-between border-gray-200 px-4 py-3 text-sm hover:shadow-md">
       <div className="flex items-center gap-3">
         {message.isImportant ? (
           <div
