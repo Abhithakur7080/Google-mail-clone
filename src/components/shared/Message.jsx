@@ -75,7 +75,7 @@ const Message = ({ message }) => {
         {location.pathname !== "/" && (
           <div className="flex-[0.5] ml-2">
             <p
-              className={`text-gray-700 inline-block max-w-full trunck-text ${
+              className={`text-gray-700 inline-block max-w-full ${
                 !message.read && "font-bold text-gray-700"
               }`}
             >
