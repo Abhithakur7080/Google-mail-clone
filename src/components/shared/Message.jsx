@@ -70,7 +70,7 @@ const Message = ({ message }) => {
       </div>
       <div
         onClick={handleClick}
-        className="hover:cursor-pointer flex flex-1 items-center justify-between"
+        className="hover:cursor-pointer flex flex-1 items-center justify-between flex-col md:flex-row"
       >
         {location.pathname !== "/" && (
           <div className="flex-[0.5] ml-2">

@@ -154,7 +154,7 @@ const Inbox = () => {
         </div>
       </div>
       <div className="h-[90vh] overflow-y-auto">
-        <div className="flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-1">
           {mailType.map((item) => (
             <button
               key={item.id}
