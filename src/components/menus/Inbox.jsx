@@ -10,7 +10,8 @@ import {
 } from "react-icons/md";
 import { TbUsers } from "react-icons/tb";
 import Messages from "../shared/Messages";
-import { getAllDocsFromFirestore } from "../../firebase/builds";
+import { getMultipleDocsFromFirestore } from "../../firebase/builds";
+import { useFirebase } from "../../firebase/firebase";
 
 const mailType = [
   {
@@ -34,17 +35,82 @@ const Inbox = () => {
   const [mailQtyActive, setMailQtyActive] = useState(false);
   const [mailTypeSelected, setMailTypeSelected] = useState(1);
   const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const currentUser = useFirebase();
+
   useEffect(() => {
-    const unsubscribe = getAllDocsFromFirestore("inbox", (data) => {
-      setMessages(data);
-    });
-    return () => {
-      unsubscribe();
+    const fetchMails = async () => {
+      if (currentUser?.email) {
+        try {
+          const inboxMailsResult = await getMultipleDocsFromFirestore(
+            "inbox",
+            "receiver",
+            currentUser.email
+          );
+          const starredMailsResult = await getMultipleDocsFromFirestore(
+            "starred",
+            "receiver",
+            currentUser.email
+          );
+          
+          const snoozedMailsResult = await getMultipleDocsFromFirestore(
+            "snoozed",
+            "receiver",
+            currentUser.email
+          );
+
+          const inboxMails = inboxMailsResult.data;
+          const starredMails = starredMailsResult.data;
+          const snoozedMails = snoozedMailsResult.data;
+          
+          const inboxMailsWithStarred = inboxMails.map((mail) => ({
+            ...mail,
+            isStarred: false,
+          }));
+
+          const starredMailsWithStarred = starredMails.map((mail) => ({
+            ...mail,
+            isStarred: true,
+          }));
+
+          let allMails = [
+            ...starredMailsWithStarred,
+            ...inboxMailsWithStarred,
+          ];
+
+          const currentTime = new Date(); // JavaScript Date object
+
+          // Filter snoozed mails based on snoozedTime
+          const validSnoozedMails = snoozedMailsResult.data.filter((mail) => {
+            const snoozedTime = mail.snoozedTime; // Convert Firestore Timestamp to Date
+            return snoozedTime <= currentTime;
+          });
+          
+          const snoozedMailIds = validSnoozedMails.map(mail => mail.id);
+          allMails = allMails.filter(mail => !snoozedMailIds.includes(mail.id));
+
+          const uniqueMails = Array.from(
+            new Set(allMails.map((mail) => mail.id))
+          ).map((id) => {
+            return allMails.find((mail) => mail.id === id);
+          });
+
+          setMessages(uniqueMails);
+        } catch (error) {
+          console.error("Error fetching mails: ", error);
+        } finally {
+          setLoading(false);
+        }
+      }
     };
-  }, []);
-  if (!messages) {
-    return <div className="">Loading...</div>;
+
+    fetchMails();
+  }, [currentUser]);
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
+
   return (
     <div className="flex-1 bg-white rounded-xl mx-5">
       <div className="flex items-center justify-between px-4">
@@ -64,14 +130,18 @@ const Inbox = () => {
             onMouseOut={() => setMailQtyActive(false)}
             className="ml-auto p-2 rounded-sm hover:bg-gray-200 cursor-pointer relative"
           >
-            <p>1 - 50 of 20,314</p>
+            <p>
+              {messages.length > 0 ? "1" : "0"} -{" "}
+              {messages.length >= 50 ? "50" : messages.length} of{" "}
+              {messages.length}
+            </p>
             <div
               className={`absolute top-9 left-0 w-full ${
                 mailQtyActive ? "block" : "hidden"
               }`}
             >
-              <h3 className="px-3 py-2 text-xl hover:bg-gray-100">Newest</h3>
-              <h3 className="px-3 py-2 text-xl hover:bg-gray-100">Oldest</h3>
+              <h3 className="px-3 py-2 text-xl bg-white hover:bg-gray-100">Newest</h3>
+              <h3 className="px-3 py-2 text-xl bg-white hover:bg-gray-100">Oldest</h3>
             </div>
           </div>
 

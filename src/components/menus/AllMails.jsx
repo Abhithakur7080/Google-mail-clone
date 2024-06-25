@@ -6,7 +6,7 @@ import { useFirebase } from "../../firebase/firebase";
 import { getMultipleDocsFromFirestore } from "../../firebase/builds";
 import Messages from "../shared/Messages";
 
-const Starred = () => {
+const AllMail = () => {
   const [mailQtyActive, setMailQtyActive] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,16 +16,18 @@ const Starred = () => {
     const fetchMails = async () => {
       try {
         if (currentUser?.email) {
-          const mails = await getMultipleDocsFromFirestore(
-            "starred",
+          const mailsSender = await getMultipleDocsFromFirestore(
+            "inbox",
+            "sender",
+            currentUser.email
+          );
+          const mailsReceiver = await getMultipleDocsFromFirestore(
+            "inbox",
             "receiver",
             currentUser.email
           );
-          const starredMailsWithStarred = mails.data.map((mail) => ({
-            ...mail,
-            isStarred: true,
-          }));
-          const sortedMails = starredMailsWithStarred.sort((a, b) => {
+          const allmails = [...mailsSender.data, ...mailsReceiver.data]
+          const sortedMails = allmails.sort((a, b) => {
             const aTimestamp = a.createdAt ? a.createdAt.seconds : 0;
             const bTimestamp = b.createdAt ? b.createdAt.seconds : 0;
             return bTimestamp - aTimestamp;
@@ -83,10 +85,10 @@ const Starred = () => {
         </div>
       </div>
       <div className="h-[90vh] overflow-y-auto">
-        <Messages messages={messages} />
+        <Messages messages={messages} path="/send"/>
       </div>
     </div>
   );
 };
 
-export default Starred;
+export default AllMail;

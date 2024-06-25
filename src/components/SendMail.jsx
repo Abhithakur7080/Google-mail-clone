@@ -11,7 +11,7 @@ import {
 } from "../redux/reducers/appSlice";
 import { useFirebase } from "../firebase/firebase";
 import { serverTimestamp } from "firebase/firestore";
-import { newMail } from "../redux/reducers/mailSlice";
+import { draftMail, newMail } from "../redux/reducers/mailSlice";
 import { timeAgo } from "../firebase/utils";
 
 const SendMail = () => {
@@ -31,6 +31,10 @@ const SendMail = () => {
   };
   const handleSubmitFormData = (e) => {
     e.preventDefault();
+    if(!formData.receiver || !formData.subject || !formData.content){
+      alert("All fields are required")
+      return;
+    }
     const updatedData = {
       ...formData,
       sender: currentUser.email,
@@ -46,6 +50,25 @@ const SendMail = () => {
     });
     dispatch(setOpen(false));
   };
+
+  const handleClose = () => {
+    if(open && formData.receiver && formData.subject && formData.content){
+      const updatedData = {
+        ...formData,
+        read: true,
+        sender: currentUser.email,
+        createdAt: setDataToFirestoreRef(),
+      };
+      dispatch(draftMail(updatedData));
+      setFormData({
+        sender: "",
+        receiver: "",
+        subject: "",
+        content: "",
+      });
+      dispatch(setOpen(false))
+    }
+  }
 
   return (
     <div
@@ -72,7 +95,7 @@ const SendMail = () => {
           )}
         </div>
         <div
-          onClick={() => dispatch(setOpen(false))}
+          onClick={handleClose}
           className="p-2 rounded-full bg-gray-200 cursor-pointer"
         >
           <RxCross2 size={20} />

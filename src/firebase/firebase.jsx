@@ -28,6 +28,7 @@ const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setCurrentUser(currentUser);
+        console.log(currentUser);
         navigate("/");
       } else {
         setCurrentUser(null);

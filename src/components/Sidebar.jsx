@@ -50,7 +50,7 @@ const menus = [
     id: 5,
     icon: <MdOutlineDrafts size={24} />,
     text: "Drafts",
-    link: "/drafts"
+    link: "/draft"
   },
 ];
 const moreMenus = [
@@ -58,46 +58,55 @@ const moreMenus = [
     id: 1,
     icon: <BiLabel size={24} />,
     text: "Important",
+    link: "/important"
   },
   {
     id: 2,
     icon: <BsChatLeftText size={24} />,
     text: "Chats",
+    link: "/"
   },
   {
     id: 3,
     icon: <MdOutlineScheduleSend size={24} />,
     text: "Scheduled",
+    link: "/"
   },
   {
     id: 4,
     icon: <LuMails size={24} />,
     text: "All Mail",
+    link: "/all"
   },
   {
     id: 5,
     icon: <RiSpam2Line size={24} />,
     text: "Spam",
+    link: "/"
   },
   {
     id: 6,
     icon: <LiaTrashAlt size={24} />,
     text: "Trash",
+    spam: "/"
   },
   {
     id: 7,
     icon: <MdLabelOutline size={24} />,
     text: "Categories",
+    link: "/"
   },
   {
     id: 8,
     icon: <VscGear size={24} />,
     text: "Manage labels",
+    link: "/"
   },
   {
     id: 9,
     icon: <LuPlus size={24} />,
     text: "Create new label",
+    link: "/"
   },
 ];
 
@@ -173,7 +182,7 @@ const Sidebar = () => {
       </div>
       {expand &&
         moreMenus.map((menu) => (
-          <div
+          <Link to={menu.link}
             data-tooltip-id={menu.text}
             key={menu.id}
             className="text-gray-800"
@@ -183,7 +192,7 @@ const Sidebar = () => {
               {menuOpen && <p>{menu.text}</p>}
             </div>
             <ReactTooltip id={menu.text} place={"right"} content={menu.text} />
-          </div>
+          </Link>
         ))}
     </div>
   );

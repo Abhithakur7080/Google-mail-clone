@@ -6,7 +6,7 @@ import { useFirebase } from "../../firebase/firebase";
 import { getMultipleDocsFromFirestore } from "../../firebase/builds";
 import Messages from "../shared/Messages";
 
-const Starred = () => {
+const Important = () => {
   const [mailQtyActive, setMailQtyActive] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,15 +17,15 @@ const Starred = () => {
       try {
         if (currentUser?.email) {
           const mails = await getMultipleDocsFromFirestore(
-            "starred",
+            "important",
             "receiver",
             currentUser.email
           );
-          const starredMailsWithStarred = mails.data.map((mail) => ({
+          const importantMailsWithimportant = mails.data.map((mail) => ({
             ...mail,
-            isStarred: true,
+            isImportant: true,
           }));
-          const sortedMails = starredMailsWithStarred.sort((a, b) => {
+          const sortedMails = importantMailsWithimportant.sort((a, b) => {
             const aTimestamp = a.createdAt ? a.createdAt.seconds : 0;
             const bTimestamp = b.createdAt ? b.createdAt.seconds : 0;
             return bTimestamp - aTimestamp;
@@ -89,4 +89,4 @@ const Starred = () => {
   );
 };
 
-export default Starred;
+export default Important;

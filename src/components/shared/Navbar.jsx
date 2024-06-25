@@ -35,11 +35,11 @@ const Navbar = () => {
           </div>
         </div>
         <div className="md:block hidden w-[50%]">
-          <div className="flex items-center bg-[#eaf1fb] px-2 py-2 rounded-full">
+          <div className="flex items-center bg-[#eaf1fb] w-full px-2 py-2 rounded-full">
             {/* Search */}
             <div
               data-tooltip-id="search"
-              className="p-3 rounded-full hover:bg-gray-300 cursor-pointer"
+              className="p-3 rounded-full hover:bg-gray-300 cursor-pointer flex-1"
             >
               <input
                 type="text"
@@ -49,9 +49,9 @@ const Navbar = () => {
             </div>
             <div
               data-tooltip-id="search-options"
-              className="p-3 rounded-full hover:bg-gray-300 cursor-pointer"
+              className="p-3 rounded-full hover:bg-gray-300 cursor-pointer ml-auto"
             >
-              <GoGear size={30} className="text-gray-700" />
+              <GoGear size={30} className="text-gray-700 " />
             </div>
           </div>
         </div>

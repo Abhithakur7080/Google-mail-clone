@@ -6,7 +6,7 @@ import { useFirebase } from "../../firebase/firebase";
 import { getMultipleDocsFromFirestore } from "../../firebase/builds";
 import Messages from "../shared/Messages";
 
-const Starred = () => {
+const Snoozed = () => {
   const [mailQtyActive, setMailQtyActive] = useState(false);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -17,15 +17,11 @@ const Starred = () => {
       try {
         if (currentUser?.email) {
           const mails = await getMultipleDocsFromFirestore(
-            "starred",
+            "snoozed",
             "receiver",
             currentUser.email
           );
-          const starredMailsWithStarred = mails.data.map((mail) => ({
-            ...mail,
-            isStarred: true,
-          }));
-          const sortedMails = starredMailsWithStarred.sort((a, b) => {
+          const sortedMails = mails.data.sort((a, b) => {
             const aTimestamp = a.createdAt ? a.createdAt.seconds : 0;
             const bTimestamp = b.createdAt ? b.createdAt.seconds : 0;
             return bTimestamp - aTimestamp;
@@ -63,14 +59,22 @@ const Starred = () => {
             onMouseOut={() => setMailQtyActive(false)}
             className="ml-auto p-2 rounded-sm hover:bg-gray-200 cursor-pointer relative"
           >
-            <p>{messages.length>0 ? "1" : "0"} - {messages.length >= 50 ? "50" : messages.length} of {messages.length}</p>
+            <p>
+              {messages.length > 0 ? "1" : "0"} -{" "}
+              {messages.length >= 50 ? "50" : messages.length} of{" "}
+              {messages.length}
+            </p>
             <div
               className={`absolute top-9 left-0 w-full ${
                 mailQtyActive ? "block" : "hidden"
               }`}
             >
-              <h3 className="px-3 py-2 text-xl bg-white hover:bg-gray-100">Newest</h3>
-              <h3 className="px-3 py-2 text-xl bg-white hover:bg-gray-100">Oldest</h3>
+              <h3 className="px-3 py-2 text-xl bg-white hover:bg-gray-100">
+                Newest
+              </h3>
+              <h3 className="px-3 py-2 text-xl bg-white hover:bg-gray-100">
+                Oldest
+              </h3>
             </div>
           </div>
 
@@ -89,4 +93,4 @@ const Starred = () => {
   );
 };
 
-export default Starred;
+export default Snoozed;

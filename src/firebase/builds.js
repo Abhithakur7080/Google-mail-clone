@@ -3,11 +3,13 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
+  getDocs,
   onSnapshot,
-  orderBy,
   query,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { GoogleAuthProvider, signInWithRedirect, signOut } from "firebase/auth";
 import { auth, db } from "./firebase";
@@ -51,7 +53,12 @@ export const signInWithGoogle = async () => {
     console.log(error);
   }
 };
-export const getADataFromFirestoreRef = (
+export const getADataFromFirestoreRef = async (collectionName, reference) => {
+  const docRef = doc(db, collectionName, reference);
+  const docSnap = await getDoc(docRef);
+  return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
+};
+export const getADataFromFirestoreRealtimeRef = (
   collectionName,
   reference,
   onDataReceived
@@ -77,19 +84,23 @@ export const getAllDocsFromFirestore = (collectionName, onDataReceived) => {
   });
   return unsubscribe;
 };
-export const getMultipleDocsFromFirestore = (collectionName, key, value) => {
-  let data = [];
-  const unsubscribe = onSnapshot(
-    query(collection(db, collectionName), orderBy(key, value)),
-    (snapshot) => {
-      const allDatas = snapshot.docs.map((doc) => ({
-        ...doc.data(),
-        id: doc.id,
-      }));
-      data = allDatas ? allDatas : [];
-    }
-  );
-  return { data, unsubscribe };
+export const getMultipleDocsFromFirestore = async (
+  collectionName,
+  key,
+  value
+) => {
+  try {
+    const q = query(collection(db, collectionName), where(key, "==", value));
+    const snapshot = await getDocs(q);
+    const allDatas = snapshot.docs.map((doc) => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+    return { data: allDatas };
+  } catch (error) {
+    console.error("Error fetching documents: ", error);
+    return { data: [] };
+  }
 };
 export const updateDataFromFirestore = async (
   collectionName,
@@ -102,6 +113,6 @@ export const updateDataFromFirestore = async (
     console.log(error);
   }
 };
-export const deleteDataFromFirestore = async(collectionName, reference) => {
-    await deleteDoc(doc(db, collectionName, reference));
-}
+export const deleteDataFromFirestore = async (collectionName, reference) => {
+  await deleteDoc(doc(db, collectionName, reference));
+};
