@@ -74,7 +74,7 @@ const Message = ({ message }) => {
         className="hover:cursor-pointer flex flex-1 items-center justify-between flex-col md:flex-row"
       >
         {location.pathname !== "/" && (
-          <div className="flex-[0.5] ml-2">
+          <div className="flex-[0.5] md:ml-2">
             <p
               className={`text-gray-700 inline-block max-w-full ${
                 !message.read && "font-bold text-gray-700"
@@ -93,7 +93,7 @@ const Message = ({ message }) => {
             </p>
           </div>
         )}
-        <div className="flex-1 mx-4 max-w-[75%]">
+        <div className="flex-1 md:mx-4 max-w-[75%]">
           <p
             className={`text-gray-700 inline-block max-w-full trunck-text ${
               !message.read && "font-bold text-gray-700"
