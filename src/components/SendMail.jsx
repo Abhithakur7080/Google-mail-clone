@@ -57,7 +57,7 @@ const SendMail = () => {
         ...formData,
         read: true,
         sender: currentUser.email,
-        createdAt: setDataToFirestoreRef(),
+        createdAt: serverTimestamp(),
       };
       dispatch(draftMail(updatedData));
       setFormData({

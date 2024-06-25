@@ -119,6 +119,7 @@ const Sidebar = () => {
     if (window.innerWidth >= 768) {
       dispatch(setMenuOpen(true))
     } else {
+      console.log(window.innerWidth);
       dispatch(setMenuOpen(false))
     }
   };
