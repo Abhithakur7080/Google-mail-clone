@@ -12,7 +12,7 @@ import { useDispatch } from "react-redux";
 
 const Navbar = () => {
   const [menuLogout, setMenuLogout] = useState(false);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const currentUser = useFirebase();
   const defaultAvatar =
     "https://static.vecteezy.com/system/resources/previews/019/896/008/original/male-user-avatar-icon-in-flat-design-style-person-signs-illustration-png.png";
@@ -21,7 +21,7 @@ const Navbar = () => {
     <>
       <div className="flex items-center justify-between my-0 md:my-3 h-16">
         <div className="flex items-center justify-between gap-10">
-          <div className="flex items-center gap-2 ms-8">
+          <div className="flex items-center gap-2 ms-2 md:ms-8">
             {/* menu icon */}
             <div
               onClick={() => dispatch(setMenuOpen())}
@@ -55,7 +55,7 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-        <div className="me-8">
+        <div className="me-5 md:me-8">
           <div className="flex items-center gap-2">
             <div
               data-tooltip-id="support"
@@ -150,4 +150,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export { Navbar };

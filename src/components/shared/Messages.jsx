@@ -1,15 +1,14 @@
 import React from "react";
-import Message from "./Message";
+import { Message } from "./Message";
 
-const Messages = ({messages}) => {
+const Messages = ({ messages }) => {
   return (
-    <div>{
-      messages.map((message) => (
-        <Message key={message.id} message={message}/>
+    <div>
+      {messages.map((message) => (
+        <Message key={message.id} message={message} />
       ))}
-      
     </div>
   );
 };
 
-export default Messages;
+export { Messages };

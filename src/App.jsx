@@ -10,6 +10,9 @@ import Draft from "./components/menus/Draft";
 import Snoozed from "./components/menus/Snoozed";
 import Important from "./components/menus/Important";
 import AllMail from "./components/menus/AllMails";
+import Spam from "./components/menus/Spam";
+import Trash from "./components/menus/Trash";
+import Archived from "./components/menus/Archieved";
 
 const App = () => {
   return (
@@ -23,6 +26,9 @@ const App = () => {
           <Route path="/draft" element={<Draft />} />
           <Route path="/important" element={<Important />} />
           <Route path="/all" element={<AllMail />} />
+          <Route path="/archive" element={<Archived />} />
+          <Route path="/spam" element={<Spam />} />
+          <Route path="/trash" element={<Trash />} />
           <Route path="mail/:id" element={<Mail />} />
         </Route>
         <Route path="/login" element={<Login />} />

@@ -3,52 +3,33 @@ import { FaCaretDown } from "react-icons/fa";
 import { IoMdMore, IoMdRefresh } from "react-icons/io";
 import { MdChevronLeft, MdChevronRight, MdCropSquare } from "react-icons/md";
 import { useFirebase } from "../../firebase/firebase";
-import { getMultipleDocsFromFirestore } from "../../firebase/builds";
-import Messages from "../shared/Messages";
+import {Messages} from "../shared/Messages";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchSnoozedMails, snoozedSelector } from "../../redux/reducers/snoozedSlice";
+import Loader from "../shared/Loader";
+import { useNavigate } from "react-router-dom";
 
 const Snoozed = () => {
   const [mailQtyActive, setMailQtyActive] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { messages, loading } = useSelector(snoozedSelector);
+  const dispatch = useDispatch();
   const currentUser = useFirebase();
+  const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchMails = async () => {
-      try {
-        if (currentUser?.email) {
-          const mails = await getMultipleDocsFromFirestore(
-            "snoozed",
-            "receiver",
-            currentUser.email
-          );
-          const sortedMails = mails.data.sort((a, b) => {
-            const aTimestamp = a.createdAt ? a.createdAt.seconds : 0;
-            const bTimestamp = b.createdAt ? b.createdAt.seconds : 0;
-            return bTimestamp - aTimestamp;
-          });
-          setMessages(sortedMails);
-        }
-      } catch (error) {
-        console.error("Error fetching mails: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMails();
-  }, [currentUser]);
+    if (currentUser?.email) {
+      dispatch(fetchSnoozedMails(currentUser.email));
+    }
+  }, [currentUser, dispatch]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader/>;
   }
   return (
-    <div className="flex-1 bg-white rounded-xl mx-5">
+    <div className="flex-1 bg-white rounded-xl md:mx-5">
       <div className="flex items-center justify-between px-4">
         <div className="flex items-center gap-2 text-gray-700 py-2 w-full">
-          <div className="flex items-center gap-1">
-            <MdCropSquare size={20} />
-            <FaCaretDown size={20} />
-          </div>
-          <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+          <div onClick={() => navigate(0)} className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
             <IoMdRefresh size={20} />
           </div>
           <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">

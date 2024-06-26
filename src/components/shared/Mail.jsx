@@ -7,25 +7,30 @@ import {
   MdChevronRight,
   MdOutlineAddTask,
   MdOutlineDriveFileMove,
+  MdOutlineMarkEmailRead,
   MdOutlineMarkEmailUnread,
   MdOutlineReport,
   MdOutlineWatchLater,
 } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { Link, useLocation, useParams } from "react-router-dom";
-import {
-  getADataFromFirestoreRealtimeRef,
-  getADataFromFirestoreRef,
-} from "../../firebase/builds";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { getADataFromFirestoreRef } from "../../firebase/builds";
 import { useFirebase } from "../../firebase/firebase";
 import { useDispatch } from "react-redux";
-import { addToSnoozed, markAsImportant } from "../../redux/reducers/mailSlice";
-import { serverTimestamp } from "firebase/firestore";
-import { FaCross } from "react-icons/fa";
+import {
+  addToArchive,
+  addToSnoozed,
+  markAsImportant,
+  markAsReadUnread,
+  toggleSpam,
+  trashRestore,
+} from "../../redux/reducers/mailSlice";
 import { RxCross2 } from "react-icons/rx";
+import Loader from "./Loader";
+import { Tooltip as ReactTooltip } from "react-tooltip";
+import { LiaTrashRestoreSolid } from "react-icons/lia";
 
 const Mail = () => {
-  const [mailQtyActive, setMailQtyActive] = useState(false);
   const [snoozedOpen, setSnoozedOpen] = useState(false);
   const [snoozedValue, setSnoozedValue] = useState("");
   const [message, setMessage] = useState(null);
@@ -36,26 +41,34 @@ const Mail = () => {
   useEffect(() => {
     const fetchMail = async () => {
       try {
-        // Check if mail is in the snoozed collection
         const snoozedMail = await getADataFromFirestoreRef("snoozed", id);
         const importantMail = await getADataFromFirestoreRef("important", id);
-        if (snoozedMail || importantMail) {
-          if (snoozedMail) {
-            setMessage(snoozedMail);
-          } else {
-            setMessage({...importantMail, isImportant: true});
-          }
+        const spamMail = await getADataFromFirestoreRef("spam", id);
+        const archiveMail = await getADataFromFirestoreRef("archive", id);
+        const inboxMail = await getADataFromFirestoreRef("inbox", id);
+        const trashMail = await getADataFromFirestoreRef("trash", id);
+
+        if(trashMail){
+          setMessage({
+            ...trashMail,
+            isTrashed: true,
+          });
+        } else if (spamMail) {
+          setMessage({
+            ...spamMail,
+            isSpam: true,
+          });
+        } else if(archiveMail){
+          setMessage({
+            ...archiveMail,
+            isArchived: true,
+          });
         } else {
-          const unsubscribe = getADataFromFirestoreRealtimeRef(
-            "inbox",
-            id,
-            (data) => {
-              setMessage({ ...data, snoozedTime: null });
-            }
-          );
-          return () => {
-            unsubscribe();
-          };
+          setMessage({
+            ...inboxMail,
+            isSnoozed: Boolean(snoozedMail),
+            isImportant: Boolean(importantMail),
+          });
         }
       } catch (error) {
         console.error("Error fetching mail: ", error);
@@ -66,9 +79,8 @@ const Mail = () => {
   }, [id]);
 
   if (!message) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
-
   const handleSnoozed = () => {
     if (snoozedValue) {
       const [hours, minutes] = snoozedValue.split(":");
@@ -89,61 +101,150 @@ const Mail = () => {
     }
     setSnoozedOpen(false);
   };
-
   return (
     <div className="flex-1 bg-white rounded-xl mx-5">
       <div className="flex items-center justify-between px-4">
         <div className="flex items-center gap-2 text-gray-700 py-2 w-full">
           <Link
             to={"/"}
+            data-tooltip-id="back"
             className="p-2 rounded-full hover:bg-gray-200 cursor-pointer"
           >
             <IoArrowBack size={20} />
+            <ReactTooltip
+              id={"back"}
+              place={"left"}
+              content={"Back to Index"}
+            />
           </Link>
-          <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+          <div
+            data-tooltip-id="archive"
+            onClick={() => dispatch(addToArchive({ id: id, mail: message }))}
+            className={`p-2 rounded-full cursor-pointer ${message.isArchived && "bg-blue-800 text-white"}`}
+          >
             <BiArchiveIn size={20} />
+            <ReactTooltip
+              id={"archive"}
+              place={"bottom"}
+              content={"Add to Archive"}
+            />
           </div>
-          <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+          <div
+            data-tooltip-id="spam"
+            onClick={() => dispatch(toggleSpam(message))}
+            className={`p-2 rounded-full cursor-pointer ${
+              message.isSpam && "bg-red-700 text-white"
+            }`}
+          >
             <MdOutlineReport size={20} />
+            <ReactTooltip
+              id={"spam"}
+              place={"bottom"}
+              content={"Move to Spam"}
+            />
           </div>
-          <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
-            <RiDeleteBin6Line size={20} />
+          <div
+            onClick={() =>
+              dispatch(
+                trashRestore({ id: message.id, email: currentUser.email })
+              )
+            }
+            data-tooltip-id="delete"
+            className={`p-2 rounded-full cursor-pointer ${
+              message.isTrashed && "bg-red-800 text-white"
+            }`}
+          >
+            {message.isTrashed ? (
+              <LiaTrashRestoreSolid size={20} />
+            ) : (
+              <RiDeleteBin6Line size={20} />
+            )}
+            <ReactTooltip
+              id={"delete"}
+              place={"bottom"}
+              content={`${message.isTrashed ? "Restore mail" : "Delete mail"}`}
+            />
           </div>
-          <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
-            <MdOutlineMarkEmailUnread size={20} />
-          </div>
-
-          {snoozedOpen ? (
-            <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer flex">
-              <input
-                onChange={(e) => setSnoozedValue(e.target.value)}
-                type="time"
-                placeholder="00"
-                className="outline-none border-none rounded-full pl-2"
-              />
-              <RxCross2 size={22} onClick={handleSnoozed} />
-            </div>
-          ) : (
+          {!message.isSpam && (
             <div
-              onClick={() => setSnoozedOpen(true)}
-              className={`p-2 rounded-full ${
-                message.snoozedTime && "text-blue-700"
-              } hover:bg-gray-200 cursor-pointer`}
+              onClick={() =>
+                dispatch(markAsReadUnread({ id: id, mail: message }))
+              }
+              data-tooltip-id="unread"
+              className={`p-2 rounded-full cursor-pointer ${message.read && "bg-blue-800 text-white"}`}
             >
-              <MdOutlineWatchLater size={20} />
+              {message.read ? (
+                <MdOutlineMarkEmailUnread size={20} />
+              ) : (
+                <MdOutlineMarkEmailRead size={20} />
+              )}
+
+              <ReactTooltip
+                id={"unread"}
+                place={"bottom"}
+                content={`${message.read ? "Mark as Unread" : "Mark as read"}`}
+              />
+            </div>
+          )}
+
+          {!message.isSpam &&
+            (snoozedOpen ? (
+              <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer flex">
+                <input
+                  onChange={(e) => setSnoozedValue(e.target.value)}
+                  type="time"
+                  placeholder="00"
+                  className="outline-none border-none rounded-full pl-2"
+                />
+                <RxCross2 size={22} onClick={handleSnoozed} />
+              </div>
+            ) : (
+              <div
+                data-tooltip-id="snoozed"
+                onClick={() => setSnoozedOpen(true)}
+                className={`p-2 rounded-full ${
+                  message.snoozedTime && "bg-blue-700 text-white"
+                } cursor-pointer flex items-center gap-2`}
+              >
+                {message.isSnoozed && (
+                  <span>
+                    {new Date(
+                      message.snoozedTime?.seconds * 1000
+                    ).toLocaleTimeString()}
+                  </span>
+                )}
+                <MdOutlineWatchLater size={20} />
+                <ReactTooltip
+                  id={"snoozed"}
+                  place={"bottom"}
+                  content={"set to snoozed"}
+                />
+              </div>
+            ))}
+          {!message.isSpam && (
+            <div
+              data-tooltip-id="important"
+              onClick={() =>
+                dispatch(markAsImportant({ id: id, mail: message }))
+              }
+              className={`p-2 rounded-full cursor-pointer ${
+                message.isImportant && "bg-blue-700 text-white"
+              }`}
+            >
+              <MdOutlineAddTask size={20} />
+              <ReactTooltip
+                id={"important"}
+                place={"bottom"}
+                content={"Mark as Important"}
+              />
             </div>
           )}
           <div
-            onClick={() => dispatch(markAsImportant({ id: id, mail: message }))}
-            className={`p-2 rounded-full hover:bg-gray-200 cursor-pointer ${message.isImportant && "text-blue-700"}`}
+            data-tooltip-id="more"
+            className="p-2 rounded-full hover:bg-gray-200 cursor-pointer"
           >
-            <MdOutlineAddTask size={20} />
-          </div>
-          <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
-            <MdOutlineDriveFileMove size={20} />
-          </div>
-          <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
             <IoMdMore size={20} />
+            <ReactTooltip id={"more"} place={"right"} content={"More"} />
           </div>
         </div>
       </div>

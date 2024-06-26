@@ -1,8 +1,8 @@
 import React from "react";
-import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
-import SendMail from "./SendMail";
-import Navbar from "./shared/Navbar";
+import { Sidebar } from "./Sidebar";
+import { SendMail } from "./SendMail";
+import { Navbar } from "./shared/Navbar";
 import { useSelector } from "react-redux";
 import { appSelector } from "../redux/reducers/appSlice";
 

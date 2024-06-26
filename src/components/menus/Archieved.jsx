@@ -6,24 +6,25 @@ import { useFirebase } from "../../firebase/firebase";
 import { Messages } from "../shared/Messages";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  draftSelector,
-  fetchDraftMails,
-} from "../../redux/reducers/draftSlice";
+  archiveSelector,
+  fetchArchiveMails,
+} from "../../redux/reducers/archiveSlice";
 import Loader from "../shared/Loader";
 import { useNavigate } from "react-router-dom";
 
-const Draft = () => {
+const Archived = () => {
   const [mailQtyActive, setMailQtyActive] = useState(false);
-  const { messages, loading } = useSelector(draftSelector);
+  const { messages, loading } = useSelector(archiveSelector);
   const dispatch = useDispatch();
   const currentUser = useFirebase();
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (currentUser?.email) {
-      dispatch(fetchDraftMails(currentUser.email));
+      dispatch(fetchArchiveMails(currentUser.email));
     }
   }, [currentUser, dispatch]);
+  console.log(messages);
 
   if (loading) {
     return <Loader/>;
@@ -77,4 +78,4 @@ const Draft = () => {
   );
 };
 
-export default Draft;
+export default Archived;

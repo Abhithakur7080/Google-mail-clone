@@ -3,36 +3,39 @@ import { FaCaretDown } from "react-icons/fa";
 import { IoMdMore, IoMdRefresh } from "react-icons/io";
 import { MdChevronLeft, MdChevronRight, MdCropSquare } from "react-icons/md";
 import { useFirebase } from "../../firebase/firebase";
-import { Messages } from "../shared/Messages";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  draftSelector,
-  fetchDraftMails,
-} from "../../redux/reducers/draftSlice";
+  fetchTrashMails,
+  trashSelector,
+} from "../../redux/reducers/trashSlice";
+import { Messages } from "../shared/Messages";
 import Loader from "../shared/Loader";
 import { useNavigate } from "react-router-dom";
 
-const Draft = () => {
+const Trash = () => {
   const [mailQtyActive, setMailQtyActive] = useState(false);
-  const { messages, loading } = useSelector(draftSelector);
+  const { messages, loading } = useSelector(trashSelector);
   const dispatch = useDispatch();
   const currentUser = useFirebase();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (currentUser?.email) {
-      dispatch(fetchDraftMails(currentUser.email));
+      dispatch(fetchTrashMails(currentUser.email));
     }
   }, [currentUser, dispatch]);
 
   if (loading) {
-    return <Loader/>;
+    return <Loader />;
   }
   return (
     <div className="flex-1 bg-white rounded-xl md:mx-5">
       <div className="flex items-center justify-between px-4">
         <div className="flex items-center gap-2 text-gray-700 py-2 w-full">
-          <div onClick={() => navigate(0)} className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
+          <div
+            onClick={() => navigate(0)}
+            className="p-2 rounded-full hover:bg-gray-200 cursor-pointer"
+          >
             <IoMdRefresh size={20} />
           </div>
           <div className="p-2 rounded-full hover:bg-gray-200 cursor-pointer">
@@ -71,10 +74,10 @@ const Draft = () => {
         </div>
       </div>
       <div className="h-[90vh] overflow-y-auto">
-        <Messages messages={messages} path="/send" />
+        <Messages messages={messages} />
       </div>
     </div>
   );
 };
 
-export default Draft;
+export default Trash;

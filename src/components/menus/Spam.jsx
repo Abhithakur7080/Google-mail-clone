@@ -3,25 +3,22 @@ import { FaCaretDown } from "react-icons/fa";
 import { IoMdMore, IoMdRefresh } from "react-icons/io";
 import { MdChevronLeft, MdChevronRight, MdCropSquare } from "react-icons/md";
 import { useFirebase } from "../../firebase/firebase";
-import { Messages } from "../shared/Messages";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  draftSelector,
-  fetchDraftMails,
-} from "../../redux/reducers/draftSlice";
+import { fetchSpamMails, spamSelector } from "../../redux/reducers/spamSlice";
+import { Messages } from "../shared/Messages";
 import Loader from "../shared/Loader";
 import { useNavigate } from "react-router-dom";
 
-const Draft = () => {
+const Spam = () => {
   const [mailQtyActive, setMailQtyActive] = useState(false);
-  const { messages, loading } = useSelector(draftSelector);
+  const { messages, loading } = useSelector(spamSelector);
   const dispatch = useDispatch();
   const currentUser = useFirebase();
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (currentUser?.email) {
-      dispatch(fetchDraftMails(currentUser.email));
+      dispatch(fetchSpamMails(currentUser.email));
     }
   }, [currentUser, dispatch]);
 
@@ -71,10 +68,10 @@ const Draft = () => {
         </div>
       </div>
       <div className="h-[90vh] overflow-y-auto">
-        <Messages messages={messages} path="/send" />
+        <Messages messages={messages}/>
       </div>
     </div>
   );
 };
 
-export default Draft;
+export default Spam;

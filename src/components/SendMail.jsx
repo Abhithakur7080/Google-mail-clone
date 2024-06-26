@@ -12,7 +12,6 @@ import {
 import { useFirebase } from "../firebase/firebase";
 import { serverTimestamp } from "firebase/firestore";
 import { draftMail, newMail } from "../redux/reducers/mailSlice";
-import { timeAgo } from "../firebase/utils";
 
 const SendMail = () => {
   const { open, minimize, full } = useSelector(appSelector);
@@ -29,10 +28,18 @@ const SendMail = () => {
     let value = e.target.value;
     setFormData({ ...formData, [key]: value });
   };
+  const handleClear = () => {
+    setFormData({
+      sender: "",
+      receiver: "",
+      subject: "",
+      content: "",
+    });
+  };
   const handleSubmitFormData = (e) => {
     e.preventDefault();
-    if(!formData.receiver || !formData.subject || !formData.content){
-      alert("All fields are required")
+    if (!formData.receiver || !formData.subject || !formData.content) {
+      alert("All fields are required");
       return;
     }
     const updatedData = {
@@ -42,17 +49,12 @@ const SendMail = () => {
       createdAt: serverTimestamp(),
     };
     dispatch(newMail(updatedData));
-    setFormData({
-      sender: "",
-      receiver: "",
-      subject: "",
-      content: "",
-    });
+    handleClear();
     dispatch(setOpen(false));
   };
 
   const handleClose = () => {
-    if(open && formData.receiver && formData.subject && formData.content){
+    if (open && formData.receiver && formData.subject && formData.content) {
       const updatedData = {
         ...formData,
         read: true,
@@ -60,15 +62,10 @@ const SendMail = () => {
         createdAt: serverTimestamp(),
       };
       dispatch(draftMail(updatedData));
-      setFormData({
-        sender: "",
-        receiver: "",
-        subject: "",
-        content: "",
-      });
+      handleClear();
     }
-    dispatch(setOpen(false))
-  }
+    dispatch(setOpen(false));
+  };
 
   return (
     <div
@@ -140,4 +137,4 @@ const SendMail = () => {
   );
 };
 
-export default SendMail;
+export { SendMail };

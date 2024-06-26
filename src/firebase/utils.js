@@ -1,25 +1,112 @@
-export const timeAgo = (createAt) => {
-  const currentDate = new Date();
-  const difference = Math.abs(currentDate - new Date(createAt));
-
-  const seconds = difference / 1000;
-  const minutes = seconds / 60;
-  const hours = minutes / 60;
-  const days = hours / 24;
-  const weeks = days / 7;
-  const years = weeks / 52;
-
-  if (seconds < 60) {
-    return `${Math.round(seconds)}`;
-  } else if (minutes < 60) {
-    return `${Math.round(minutes)}`;
-  } else if (hours < 24) {
-    return `${Math.round(hours)} hours ago`;
-  } else if (days < 7) {
-    return `${Math.round(days)} days ago`;
-  } else if (weeks < 52) {
-    return `${Math.round(weeks)} weeks ago`;
-  } else {
-    return `${Math.round(years)} years ago`;
-  }
+export const sortMail = (arr = []) => {
+  const sortedMail = arr.sort((a, b) => {
+    const aTimestamp = a.createdAt ? a.createdAt.seconds : 0;
+    const bTimestamp = b.createdAt ? b.createdAt.seconds : 0;
+    return bTimestamp - aTimestamp;
+  });
+  return sortedMail;
+};
+const spamKeywords = [
+  "win",
+  "winner",
+  "congratulations",
+  "free",
+  "prize",
+  "bonus",
+  "claim",
+  "urgent",
+  "immediate",
+  "offer",
+  "limited time",
+  "exclusive",
+  "click here",
+  "click now",
+  "act now",
+  "action required",
+  "special promotion",
+  "no cost",
+  "apply now",
+  "call now",
+  "buy now",
+  "discount",
+  "cheap",
+  "bargain",
+  "save big",
+  "clearance",
+  "lottery",
+  "cash prize",
+  "gift card",
+  "money back",
+  "refund",
+  "risk-free",
+  "investment",
+  "guaranteed",
+  "winner",
+  "won",
+  "low price",
+  "credit card",
+  "free trial",
+  "online pharmacy",
+  "prescription drugs",
+  "lose weight",
+  "work from home",
+  "make money",
+  "financial freedom",
+  "debt relief",
+  "best deal",
+  "earn money",
+  "income opportunity",
+  "mortgage rates",
+  "payday loan",
+  "get paid",
+  "miracle",
+  "cure",
+  "viagra",
+  "casino",
+  "betting",
+  "adult",
+  "porn",
+  "sex",
+  "xxx",
+  "luxury",
+  "rolex",
+  "fake",
+  "replica",
+  "fast cash",
+  "free access",
+  "limited offer",
+  "exclusive deal",
+  "urgent response",
+  "apply today",
+  "100% free",
+  "order now",
+  "instant",
+  "click to win",
+  "trial",
+  "double your",
+  "earn extra",
+  "money making",
+  "extra cash",
+  "fantastic",
+  "amazing",
+  "unbelievable",
+  "too good to be true",
+  "satisfaction guaranteed",
+  "get rich quick",
+  "hidden fees",
+  "win big",
+  "investment opportunity",
+  "big profits",
+  "free consultation",
+  "claim your",
+  "be your own boss",
+  "no experience needed",
+];
+export const isSpam = (data) => {
+  return spamKeywords.some(
+    (keyword) =>
+      data.receiver.toLowerCase().includes(keyword) ||
+      data.subject.toLowerCase().includes(keyword) ||
+      data.content.toLowerCase().includes(keyword)
+  );
 };
