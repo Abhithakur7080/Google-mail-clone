@@ -5,7 +5,7 @@ import { signInWithGoogle } from "../firebase/builds";
 const Login = () => {
   return (
     <div className="w-screen h-screen flex items-center justify-center">
-      <div className="w-[450px] h-fit shadow-md shadow-gray-600 rounded-sm flex flex-col items-center">
+      <div className="w-[450px] h-screen md:h-fit md:shadow-md shadow-gray-600 rounded-sm flex flex-col items-center">
         <div className="w-3/4 slide-bottom">
           <img src={logo} alt="logo" className="w-full" />
         </div>
