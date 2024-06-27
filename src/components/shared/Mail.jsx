@@ -119,7 +119,7 @@ const Mail = () => {
           </Link>
           <div
             data-tooltip-id="archive"
-            onClick={() => dispatch(addToArchive({ id: id, mail: message }))}
+            onClick={() => dispatch(addToArchive(id))}
             className={`p-2 rounded-full cursor-pointer ${message.isArchived && "bg-blue-800 text-white"}`}
           >
             <BiArchiveIn size={20} />

@@ -90,12 +90,15 @@ export const addToArchive = createAsyncThunk(
   "addToArchive",
   async (id, { rejectWithValue }) => {
     try {
+      console.log(id);
       const archivedData = await getADataFromFirestoreRef("archive", id);
+      console.log(archivedData);
       if (archivedData) {
         await deleteDataFromFirestore("archive", id);
         await setDataToFirestoreRef("inbox", id, archivedData);
       } else {
         const inboxedData = await getADataFromFirestoreRef("inbox", id);
+        console.log(inboxedData);
         await deleteDataFromFirestore("inbox", id);
         await deleteDataFromFirestore("starred", id);
         await deleteDataFromFirestore("snoozed", id);
