@@ -48,7 +48,7 @@ const Mail = () => {
         const inboxMail = await getADataFromFirestoreRef("inbox", id);
         const trashMail = await getADataFromFirestoreRef("trash", id);
 
-        if(trashMail){
+        if (trashMail) {
           setMessage({
             ...trashMail,
             isTrashed: true,
@@ -58,7 +58,7 @@ const Mail = () => {
             ...spamMail,
             isSpam: true,
           });
-        } else if(archiveMail){
+        } else if (archiveMail) {
           setMessage({
             ...archiveMail,
             isArchived: true,
@@ -67,6 +67,7 @@ const Mail = () => {
           setMessage({
             ...inboxMail,
             isSnoozed: Boolean(snoozedMail),
+            snoozedTime: Boolean(snoozedMail) ? snoozedMail.snoozedTime : null,
             isImportant: Boolean(importantMail),
           });
         }
@@ -120,7 +121,9 @@ const Mail = () => {
           <div
             data-tooltip-id="archive"
             onClick={() => dispatch(addToArchive(id))}
-            className={`p-2 rounded-full cursor-pointer ${message.isArchived && "bg-blue-800 text-white"}`}
+            className={`p-2 rounded-full cursor-pointer ${
+              message.isArchived && "bg-blue-800 text-white"
+            }`}
           >
             <BiArchiveIn size={20} />
             <ReactTooltip
@@ -171,7 +174,9 @@ const Mail = () => {
                 dispatch(markAsReadUnread({ id: id, mail: message }))
               }
               data-tooltip-id="unread"
-              className={`p-2 rounded-full cursor-pointer ${message.read && "bg-blue-800 text-white"}`}
+              className={`p-2 rounded-full cursor-pointer ${
+                message.read && "bg-blue-800 text-white"
+              }`}
             >
               {message.read ? (
                 <MdOutlineMarkEmailUnread size={20} />
@@ -203,7 +208,7 @@ const Mail = () => {
                 data-tooltip-id="snoozed"
                 onClick={() => setSnoozedOpen(true)}
                 className={`p-2 rounded-full ${
-                  message.snoozedTime && "bg-blue-700 text-white"
+                  message.isSnoozed && "bg-blue-700 text-white"
                 } cursor-pointer flex items-center gap-2`}
               >
                 {message.isSnoozed && (
