@@ -1,4 +1,4 @@
-<h1 align="center" style="font-size: 30px;"><img src="./src/assets/gmail.ico" width=30/> GOOGLE MAIL</h1>
+<h1 align="center" style="font-size: 30px;"><img src="https://github.com/Abhithakur7080/Google-mail-clone/assets/119639453/45e77ac7-c3c2-46a2-b781-583ba2a3a3cf" width=36/> GOOGLE MAIL</h1>
 
 
 This project is clone of Google Mail, built by using React.js, Redux-Toolkit, Context API, Firebase, and Tailwind CSS to provide users with a professional mail services.
