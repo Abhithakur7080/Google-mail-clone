@@ -11,7 +11,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { GoogleAuthProvider, signInWithRedirect, signOut } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut } from "firebase/auth";
 import { auth, db } from "./firebase";
 
 export const addDataToFirebase = async (collectionName, data) => {
@@ -48,7 +48,7 @@ export const logout = async () => {
 export const signInWithGoogle = async () => {
   try {
     const googleProvider = new GoogleAuthProvider();
-    await signInWithRedirect(auth, googleProvider);
+    await signInWithPopup(auth, googleProvider);
   } catch (error) {
     console.log(error);
   }
