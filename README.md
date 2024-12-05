@@ -4,7 +4,7 @@
 This project is clone of Google Mail, built by using React.js, Redux-Toolkit, Context API, Firebase, and Tailwind CSS to provide users with a professional mail services.
 
 ## Hosted Link
-[explore](https://shopie-x.netlify.app)
+[explore](https://google-mail-x.netlify.app/)
 
 ## Features
 - **Responsive Design:** We ensure our platform adjusts flawlessly to various screens, promising a smooth and enjoyable user experience across different devices.
